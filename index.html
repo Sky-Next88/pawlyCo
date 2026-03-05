@@ -7,53 +7,21 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
 body{background:#fff5fc;color:#333}
-.nav{
-  background:#ff8fb8;
-  padding:16px 24px;
-  color:white;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:sticky;top:0;z-index:10
-}
+.nav{background:#ff8fb8;padding:16px 24px;color:white;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0}
 .logo{font-size:22px;font-weight:700}
-.cartbtn{
-  background:white;color:#ff5a8c;
-  padding:8px 14px;border-radius:999px;font-weight:700;cursor:pointer
-}
-.hero{
-  background:linear-gradient(90deg,#ffc4de,#ff8fb8);
-  color:white;text-align:center;padding:50px 20px
-}
-.hero h1{font-size:32px;margin-bottom:10px}
+.cartbtn{background:white;color:#ff5a8c;padding:8px 14px;border-radius:999px;font-weight:700}
+.hero{background:linear-gradient(90deg,#ffc4de,#ff8fb8);color:white;text-align:center;padding:50px 20px}
 .container{max-width:1100px;margin:0 auto;padding:30px 20px}
-.section-title{
-  font-size:24px;color:#ff5a8c;margin-bottom:20px;font-weight:700
-}
-.upload-box{
-  background:white;padding:20px;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin-bottom:30px
-}
-.upload-box h3{margin-bottom:12px;color:#ff5a8c}
-input,textarea{
-  width:100%;padding:12px;border-radius:10px;border:1px solid #eee;margin-bottom:10px;resize:none
-}
-.addpro{
-  background:#ff8fb8;color:white;border:0;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;width:100%
-}
-.products{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:18px
-}
-.card{
-  background:white;border-radius:16px;overflow:hidden;box-shadow:0 6px 14px rgba(0,0,0,.06);transition:.3s
-}
-.card:hover{transform:translateY(-6px)}
+.upload-box{background:white;padding:20px;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin-bottom:30px}
+input,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #eee;margin-bottom:10px}
+.addpro{background:#ff8fb8;color:white;border:0;padding:12px;border-radius:10px;font-weight:700;width:100%;cursor:pointer}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+.card{background:white;border-radius:16px;overflow:hidden;box-shadow:0 6px 14px rgba(0,0,0,.06)}
 .card img{width:100%;height:180px;object-fit:cover;background:#ffe5f2}
 .info{padding:14px}
-.pname{font-weight:700;font-size:16px}
-.pdesc{color:#999;font-size:12px;margin:6px 0 10px}
-.price{font-size:20px;color:#ff3d71;font-weight:700;margin-bottom:10px}
+.pname{font-weight:700}
+.pdesc{color:#999;font-size:12px;margin:6px 0}
+.price{font-size:20px;color:#ff3d71;font-weight:700;margin:10px 0}
 .btns{display:flex;gap:8px}
 .btn{flex:1;padding:10px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
 .btn-cart{background:#ffe1ec;color:#ff5a8c}
@@ -75,7 +43,7 @@ input,textarea{
 <div class="container">
 
 <div class="upload-box">
-  <h3>Add New Product (For you to upload)</h3>
+  <h3>Add New Product</h3>
   <input type="text" id="pname" placeholder="Product Name">
   <textarea id="pdesc" placeholder="Description"></textarea>
   <input type="text" id="pprice" placeholder="Price (e.g. $12.99)">
@@ -83,27 +51,36 @@ input,textarea{
   <button class="addpro" onclick="addProduct()">Add Product</button>
 </div>
 
-<h2 class="section-title">All Products</h2>
-<div class="products" id="productList"></div>
+<h2 style="margin-bottom:20px;color:#ff5a8c">All Products</h2>
+<div class="products" id="list"></div>
 
 </div>
 
 <script>
+function load(){
+  let data=localStorage.getItem("products")
+  if(data){
+    let arr=JSON.parse(data)
+    let html=""
+    for(let i=arr.length-1;i>=0;i--){
+      let p=arr[i]
+      html+=`<div class="card"><img src="${p.img}"><div class="info"><div class="pname">${p.name}</div><div class="pdesc">${p.desc}</div><div class="price">${p.price}</div><div class="btns"><button class="btn btn-cart">Add to Cart</button><button class="btn btn-buy">Buy Now</button></div></div></div>`
+    }
+    document.getElementById("list").innerHTML=html
+  }
+}
+load()
+
 function addProduct(){
   let name=document.getElementById("pname").value
   let desc=document.getElementById("pdesc").value
   let price=document.getElementById("pprice").value
   let img=document.getElementById("pimg").value||"https://via.placeholder.com/400x300/FFE5F2/FF8FB8?text=Pet+Toy"
   if(!name||!price)return alert("Please fill name and price")
-  let list=document.getElementById("productList")
-  let card=document.createElement("div")
-  card.className="card"
-  card.innerHTML=`<img src="${img}"><div class="info"><div class="pname">${name}</div><div class="pdesc">${desc}</div><div class="price">${price}</div><div class="btns"><button class="btn btn-cart">Add to Cart</button><button class="btn btn-buy">Buy Now</button></div></div>`
-  list.prepend(card)
-  document.getElementById("pname").value=""
-  document.getElementById("pdesc").value=""
-  document.getElementById("pprice").value=""
-  document.getElementById("pimg").value=""
+  let arr=JSON.parse(localStorage.getItem("products")||"[]")
+  arr.push({name,desc,price,img})
+  localStorage.setItem("products",JSON.stringify(arr))
+  location.reload()
 }
 </script>
 
