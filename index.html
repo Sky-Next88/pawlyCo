@@ -4,41 +4,181 @@
 <meta charset="UTF-8">
 <title>PetPaw - Cute Pet Toys</title>
 <style>
-body{font-family:Arial;margin:0;padding:20px;background:#f9f9f9;}
-.container{max-width:900px;margin:0 auto;}
-h1{color:#ff5e7e;text-align:center;}
-.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;margin-top:20px;}
-.card{background:white;border-radius:12px;padding:15px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-.card img{width:100%;height:160px;object-fit:cover;border-radius:8px;}
-.card h3{margin:10px 0 5px;font-size:16px;}
-.card .price{color:#ff5e7e;font-weight:bold;font-size:18px;}
-.form{background:white;padding:20px;border-radius:12px;margin-bottom:20px;}
-input,button{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px;font-size:14px;}
-button{background:#ff5e7e;color:white;border:none;cursor:pointer;font-weight:bold;}
+*{box-sizing:border-box;}
+body{font-family:Arial;margin:0;background:#fff8fc;}
+
+/* 顶部大图 */
+.hero{
+  width:100%;
+  height:260px;
+  background:url("https://i.imgur.com/Ak2WdEZ.jpg") center center no-repeat;
+  background-size:cover;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:22px;
+  font-weight:bold;
+  text-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
+
+.container{
+  max-width:900px;
+  margin:0 auto;
+  padding:20px;
+}
+
+h1{
+  color:#ff5e7e;
+  text-align:center;
+  font-size:24px;
+}
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:16px;
+  margin-top:10px;
+}
+
+.card{
+  background:white;
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  cursor:pointer;
+}
+.card img{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  border-radius:10px;
+}
+.card h3{
+  margin:10px 0 4px;
+  font-size:16px;
+}
+.card .price{
+  color:#ff5e7e;
+  font-weight:bold;
+  font-size:18px;
+}
+
+/* 弹窗 */
+.modal{
+  display:none;
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.4);
+  align-items:center;
+  justify-content:center;
+}
+.modal-box{
+  background:white;
+  width:90%;
+  max-width:400px;
+  border-radius:16px;
+  padding:20px;
+  text-align:center;
+}
+.modal-box img{
+  width:100%;
+  border-radius:12px;
+}
+.modal-box h2{
+  margin:12px 0 6px;
+}
+.modal-box .desc{
+  color:#555;
+  font-size:14px;
+  line-height:1.4;
+}
+.modal-box .price{
+  font-size:22px;
+  color:#ff5e7e;
+  font-weight:bold;
+  margin:10px 0;
+}
+.modal-box button{
+  background:#ff5e7e;
+  color:white;
+  border:none;
+  padding:10px 18px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* 管理员 */
 .admin{display:none;}
+.form{
+  background:white;
+  padding:18px;
+  border-radius:12px;
+  margin:20px 0;
+}
+input,textarea{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border:1px solid #ddd;
+  border-radius:8px;
+}
+textarea{height:70px;resize:none;}
+button{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  background:#ff5e7e;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
+
+<!-- 首页大图 -->
+<div class="hero">
+  Love Your Pet, Choose The Best Toy
+</div>
+
 <div class="container">
-<h1>PetPaw - Cute Pet Toys</h1>
+  <h1>Pet Toys Shop</h1>
 
-<div class="form" id="adminPanel">
-<input type="password" id="pass" placeholder="Enter admin password">
-<button onclick="checkPass()">Unlock Admin</button>
+  <!-- 管理员入口 -->
+  <div class="form" id="adminPanel">
+    <input type="password" id="pass" placeholder="Admin Password">
+    <button onclick="checkPass()">Unlock Admin</button>
+  </div>
+
+  <!-- 添加产品 -->
+  <div class="form admin" id="addForm">
+    <input type="text" id="pname" placeholder="Product Name">
+    <textarea id="desc" placeholder="Product Description"></textarea>
+    <input type="text" id="price" placeholder="Price (USD)">
+    <input type="text" id="img" placeholder="Image URL">
+    <button onclick="addProduct()">Add Product</button>
+  </div>
+
+  <!-- 产品列表 -->
+  <div class="products" id="list"></div>
 </div>
 
-<div class="form admin" id="addForm">
-<input type="text" id="pname" placeholder="Product Name">
-<input type="text" id="price" placeholder="Price (USD)">
-<input type="text" id="img" placeholder="Image URL">
-<button onclick="addProduct()">Add Product</button>
-</div>
-
-<div class="products" id="list"></div>
+<!-- 弹窗详情 -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <img id="mimg">
+    <h2 id="mname"></h2>
+    <div class="desc" id="mdesc"></div>
+    <div class="price" id="mprice"></div>
+    <button onclick="closeModal()">Close</button>
+  </div>
 </div>
 
 <script>
-let products = JSON.parse(localStorage.getItem("petproducts") || "[]");
+let products = JSON.parse(localStorage.getItem("petproducts_final") || "[]");
 const PASSWORD = "admin123";
 
 function render(){
@@ -46,19 +186,30 @@ function render(){
   list.innerHTML = "";
   products.forEach((p, i) => {
     list.innerHTML += `
-      <div class="card">
-        <img src="${p.img}" alt="">
+      <div class="card" onclick="openModal(${i})">
+        <img src="${p.img}">
         <h3>${p.name}</h3>
         <div class="price">$${p.price}</div>
       </div>`;
   });
 }
 
+function openModal(i){
+  let p = products[i];
+  document.getElementById("mimg").src = p.img;
+  document.getElementById("mname").innerText = p.name;
+  document.getElementById("mdesc").innerText = p.desc;
+  document.getElementById("mprice").innerText = "$"+p.price;
+  document.getElementById("modal").style.display = "flex";
+}
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
+}
+
 function checkPass(){
-  let v = document.getElementById("pass").value;
-  if(v == PASSWORD){
-    document.getElementById("addForm").style.display = "block";
-    alert("Unlocked, you can add products now.");
+  if(document.getElementById("pass").value == PASSWORD){
+    document.getElementById("addForm").className = "form";
+    alert("Unlocked, you can add products.");
   }else{
     alert("Wrong password");
   }
@@ -66,13 +217,15 @@ function checkPass(){
 
 function addProduct(){
   let name = document.getElementById("pname").value;
+  let desc = document.getElementById("desc").value;
   let price = document.getElementById("price").value;
   let img = document.getElementById("img").value;
-  if(!name || !price || !img) return alert("Fill all");
-  products.unshift({name, price, img});
-  localStorage.setItem("petproducts", JSON.stringify(products));
+  if(!name || !desc || !price || !img) return alert("Fill all");
+  products.unshift({name, desc, price, img});
+  localStorage.setItem("petproducts_final", JSON.stringify(products));
   render();
   document.getElementById("pname").value="";
+  document.getElementById("desc").value="";
   document.getElementById("price").value="";
   document.getElementById("img").value="";
 }
